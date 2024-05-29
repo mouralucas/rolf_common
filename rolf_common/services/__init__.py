@@ -1,0 +1,1 @@
+from rolf_common.services.base import BaseService
