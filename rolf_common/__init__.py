@@ -1,3 +1,3 @@
-from managers import *
-from models import *
-from services import *
+from .managers.base import BaseDataManager
+from models.base import SQLModel
+from services.base import BaseService
