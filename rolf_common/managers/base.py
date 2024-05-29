@@ -7,7 +7,7 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import Executable
 
-from models.base import SQLModel
+from rolf_common.models.base import SQLModel
 
 
 class BaseDataManager:
