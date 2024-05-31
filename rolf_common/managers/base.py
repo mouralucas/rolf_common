@@ -23,8 +23,8 @@ class BaseDataManager:
 
         return model
 
-    def add_all(self, models: Sequence[Any]) -> None:
-        self.session.add_all(models)
+    async def add_all(self, models: Sequence[Any]) -> None:
+        await self.session.add_all(models)
 
     async def update_one(self, sql_statement: Executable, model: SQLModel) -> SQLModel:
         """
