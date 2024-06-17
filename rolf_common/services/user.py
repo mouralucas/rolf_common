@@ -17,9 +17,9 @@ async def require_user(token: str = Depends(oauth2_scheme)):
         payload = {
             'token': token
         }
-        response = await client.post(auth_service_base_url + '/validate/token', json=payload)
+        response = await client.get(auth_service_base_url + '/validate/token', params=payload)
 
-        # TODO: create a pydantic schema to return (must match the return from /validate/token
+        # TODO: create a pydantic schema to return (must match the return from /validate/token)
         return {
             'username': 'lucas',
             'userId': 'este.e.um.uuid',
