@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # Microservice comm settings
-    auth_service_base_url = 'localhost:8001'
+    auth_service_base_url: str = 'localhost:8001'
 
     # Project description
     project_name: str = "Library Service Microservice"
