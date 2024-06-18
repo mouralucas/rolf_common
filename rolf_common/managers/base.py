@@ -1,3 +1,4 @@
+from pyexpat import model
 from typing import Any, List, Sequence, Type
 
 from fastapi import HTTPException, status
@@ -16,15 +17,19 @@ class BaseDataManager:
 
     """Base data manager class responsible for operations over database."""
 
-    async def add_one(self, model: SQLModel) -> SQLModel:
-        self.session.add(model)
+    async def add_one(self, sql_model: SQLModel) -> SQLModel:
+        self.session.add(sql_model)
         await self.session.commit()
-        await self.session.refresh(model)
+        await self.session.refresh(sql_model)
 
-        return model
+        return sql_model
 
-    async def add_all(self, models: Sequence[Any]) -> None:
-        await self.session.add_all(models)
+    async def add_all(self, models: list[SQLModel]) -> list[SQLModel]:
+        self.session.add_all(models)
+        await self.session.commit()
+        await self.session.refresh(models)
+
+        return models
 
     async def update_one(self, sql_statement: Executable, model: SQLModel) -> SQLModel:
         """

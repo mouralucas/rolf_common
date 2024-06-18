@@ -1,28 +1,32 @@
 from httpx import AsyncClient
 from fastapi import Depends, HTTPException
 from fastapi import status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 
 from rolf_common.backend.settings import settings
+from rolf_common.schemas.auth import RequireUserResponse
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 auth_service_base_url = settings.auth_service_base_url
 
 
-async def require_user(token: str = Depends(oauth2_scheme)):
+async def get_user(permissions: SecurityScopes, token: str = Depends(oauth2_scheme)):
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token not provided')
 
+    permissions: list[str] = permissions.scopes
+
     async with AsyncClient() as client:
         payload = {
-            'token': token
+            'access_token': token,
+            'permissions': permissions
         }
-        response = await client.get(auth_service_base_url + '/validate/token', params=payload)
+        auth_response = await client.post(auth_service_base_url + '/validate/auth', json=payload)
 
-        # TODO: create a pydantic schema to return (must match the return from /validate/token)
-        return {
-            'username': 'lucas',
-            'userId': 'este.e.um.uuid',
-        }
+        response = RequireUserResponse(
+            user_id=auth_response.json()['user_id'],
+        )
+
+        return response
 
 
