@@ -21,12 +21,20 @@ async def get_user(permissions: SecurityScopes, token: str = Depends(oauth2_sche
             'access_token': token,
             'permissions': permissions
         }
+        # TODO: add some verification to check if system is online, if not change to backup or offline check
         auth_response = await client.post(auth_service_base_url + '/validate/auth', json=payload)
 
+        if auth_response.status_code != status.HTTP_200_OK:
+            return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+        data = auth_response.json()
+        user_id = data.get('userId')
+
+        if not user_id:
+            return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
         response = RequireUserResponse(
-            user_id=auth_response.json()['user_id'],
+            user_id=user_id,
         )
 
         return response
-
-
