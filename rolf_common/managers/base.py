@@ -27,7 +27,6 @@ class BaseDataManager:
     async def add_all(self, models: list[SQLModel]) -> list[SQLModel]:
         self.session.add_all(models)
         await self.session.commit()
-        await self.session.refresh(models)
 
         return models
 
