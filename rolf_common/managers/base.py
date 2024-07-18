@@ -1,3 +1,4 @@
+from datetime import datetime
 from pyexpat import model
 from typing import Any, List, Sequence, Type
 
@@ -18,19 +19,21 @@ class BaseDataManager:
     """Base data manager class responsible for operations over database."""
 
     async def add_one(self, sql_model: SQLModel) -> SQLModel:
+        sql_model.created_at = datetime.utcnow()
         self.session.add(sql_model)
         await self.session.commit()
         await self.session.refresh(sql_model)
 
         return sql_model
 
-    async def add_all(self, models: list[SQLModel]) -> list[SQLModel]:
-        self.session.add_all(models)
+    async def add_all(self, sql_models: list[SQLModel]) -> list[SQLModel]:
+        sql_models.created_at = datetime.utcnow()
+        self.session.add_all(sql_models)
         await self.session.commit()
 
-        return models
+        return sql_models
 
-    async def update_one(self, sql_statement: Executable, model: SQLModel) -> SQLModel:
+    async def update_one(self, sql_statement: Executable, sql_model: SQLModel) -> SQLModel:
         """
         :Name: update_one
         :Created by: Lucas Penha de Moura - 28/04/2024
@@ -44,13 +47,14 @@ class BaseDataManager:
             raise HTTPException(status_code=status.HTTP_428_PRECONDITION_REQUIRED)
 
         try:
+            sql_model.edited_at = datetime.utcnow()
             await self.session.execute(sql_statement)
             await self.session.commit()
-            await self.session.refresh(model)
+            await self.session.refresh(sql_model)
         except Exception as e:
             raise e
 
-        return model
+        return sql_model
 
     async def get_first(self, sql_statement: Executable,
                         raise_exception: bool = False) -> BaseModel | None:
@@ -72,7 +76,7 @@ class BaseDataManager:
 
         return result
 
-    async def get_only_one(self, select_stmt: Executable) -> SQLModel | None:
+    async def get_only_one(self, select_statement: Executable) -> SQLModel | None:
         """
         :Name: get_only_one
         :Created by: Lucas Penha de Moura - 09/02/2024
@@ -85,7 +89,7 @@ class BaseDataManager:
             return_db_model : If true, return the result from database, without converto to Pydantic class
         """
         try:
-            result = await self.session.execute(select_stmt)
+            result = await self.session.execute(select_statement)
             result = result.scalar_one()
         except NoResultFound as e:
 
@@ -94,7 +98,7 @@ class BaseDataManager:
 
         return result
 
-    async def get_all(self, select_stmt: Executable,
+    async def get_all(self, select_statement: Executable,
                       unique_result: bool = False,
                       raise_exception: bool = False) -> list[SQLModel] | None:
         """
@@ -108,7 +112,7 @@ class BaseDataManager:
             unique_result: If true, apply unique to the query, used when query contains joins ***(investigate reason)***
             raise_exception : If true, raise an exception if no data is found, if false, return None
         """
-        result = await self.session.scalars(select_stmt)
+        result = await self.session.scalars(select_statement)
         if unique_result:
             result = result.unique()
 
@@ -123,7 +127,7 @@ class BaseDataManager:
 
         return None
 
-    def get_from_tvf(self, model: Type[SQLModel], *args: Any) -> List[Any]:
+    def get_from_tvf(self, sql_model: Type[SQLModel], *args: Any) -> List[Any]:
         """Query from table valued function.
 
         This is a wrapper function that can be used to retrieve data from
@@ -144,7 +148,7 @@ class BaseDataManager:
             BaseDataManager(session).get_from_tvf(MyModel, 1, "AAA")
         """
 
-        return self.get_all(self.select_from_tvf(model, *args))
+        return self.get_all(self.select_from_tvf(sql_model, *args))
 
     @staticmethod
     def select_from_tvf(model: Type[SQLModel], *args: Any) -> Executable:
