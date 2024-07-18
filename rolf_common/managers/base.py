@@ -27,8 +27,8 @@ class BaseDataManager:
         return sql_model
 
     async def add_all(self, sql_models: list[SQLModel]) -> list[SQLModel]:
-        sql_models.created_at = datetime.utcnow()
-        self.session.add_all(sql_models)
+        updated_sql_models = [sql_model.created_at == datetime.utcnow() for sql_model in sql_models]
+        self.session.add_all(updated_sql_models)
         await self.session.commit()
 
         return sql_models
