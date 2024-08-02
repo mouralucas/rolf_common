@@ -1,8 +1,9 @@
 import uuid
 
-from fastapi.openapi.models import Schema
 from pydantic import Field
 
+from rolf_common.schemas import SuccessResponseBase
 
-class RequireUserResponse(Schema):
+
+class RequireUserResponse(SuccessResponseBase):
     user_id: uuid.UUID = Field(..., serialization_alias='userId')

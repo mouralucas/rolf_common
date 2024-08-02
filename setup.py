@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = '0.0.19'
+VERSION = '0.0.20'
 DESCRIPTION = 'Common package for all Rolf microservices'
 LONG_DESCRIPTION = 'This package contains all base classes for database managers, sql models, services and pydantic schemas'
 

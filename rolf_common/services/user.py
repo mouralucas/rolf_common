@@ -18,7 +18,7 @@ async def get_user(permissions: SecurityScopes, token: str = Depends(oauth2_sche
 
     async with AsyncClient() as client:
         payload = {
-            'access_token': token,
+            'accessToken': token,
             'permissions': permissions
         }
         # TODO: add some verification to check if system is online, if not change to backup or offline check
