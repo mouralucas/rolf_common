@@ -25,13 +25,13 @@ async def get_user(permissions: SecurityScopes, token: str = Depends(oauth2_sche
         auth_response = await client.post(auth_service_base_url + '/validate/auth', json=payload)
 
         if auth_response.status_code != status.HTTP_200_OK:
-            return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
         data = auth_response.json()
         user_id = data.get('userId')
 
         if not user_id:
-            return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
         response = RequireUserResponse(
             user_id=user_id,
