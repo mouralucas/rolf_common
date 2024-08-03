@@ -4,7 +4,7 @@ from fastapi import status
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 
 from rolf_common.backend.settings import settings
-from rolf_common.schemas.auth import RequireUserResponse
+from rolf_common.schemas.auth import RequiredUser
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 auth_service_base_url = settings.auth_service_base_url
@@ -33,7 +33,7 @@ async def get_user(permissions: SecurityScopes, token: str = Depends(oauth2_sche
         if not user_id:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-        response = RequireUserResponse(
+        response = RequiredUser(
             user_id=user_id,
         )
 
