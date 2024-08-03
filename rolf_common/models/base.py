@@ -26,6 +26,10 @@ class SQLModel(Base):
     edited_at: Mapped[datetime.datetime] = mapped_column('edited_at', nullable=True)
     deleted_at: Mapped[datetime.datetime] = mapped_column('deleted_at', nullable=True)
 
+    created_by: Mapped[uuid.UUID] = mapped_column('created_by', nullable=True, default=None)
+    edited_by: Mapped[uuid.UUID] = mapped_column('edited_by', nullable=True, default=None)
+    deleted_by: Mapped[uuid.UUID] = mapped_column('deleted_by', nullable=True, default=None)
+
     @classmethod
     def schema(cls) -> str:
         """Return name of database schema the model refers to."""
