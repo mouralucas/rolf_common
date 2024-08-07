@@ -19,7 +19,6 @@ class BaseDataManager:
     """Base data manager class responsible for operations over database."""
 
     async def add_one(self, sql_model: SQLModel) -> SQLModel:
-        sql_model.created_at = datetime.utcnow()
         self.session.add(sql_model)
         await self.session.commit()
         await self.session.refresh(sql_model)
@@ -27,8 +26,7 @@ class BaseDataManager:
         return sql_model
 
     async def add_all(self, sql_models: list[SQLModel]) -> list[SQLModel]:
-        updated_sql_models = [sql_model.created_at == datetime.utcnow() for sql_model in sql_models]
-        self.session.add_all(updated_sql_models)
+        self.session.add_all(sql_models)
         await self.session.commit()
 
         return sql_models
