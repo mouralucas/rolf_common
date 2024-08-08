@@ -12,10 +12,6 @@ from sqlalchemy.orm import Mapped, mapped_column, declarative_base
 Base = declarative_base()
 
 
-def utc_now():
-    return datetime.datetime.now(datetime.timezone.utc)
-
-
 class SQLModel(Base):
     """Base class used for model definitions.
 
@@ -26,7 +22,7 @@ class SQLModel(Base):
 
     id: Mapped[uuid.UUID] = mapped_column('id', primary_key=True, default=uuid.uuid4)
     active: Mapped[bool] = mapped_column('active', default=True)
-    created_at: Mapped[datetime.datetime] = mapped_column('created_at', default=utc_now())
+    created_at: Mapped[datetime.datetime] = mapped_column('created_at', default=datetime.datetime.utcnow)
     edited_at: Mapped[datetime.datetime] = mapped_column('edited_at', nullable=True)
     deleted_at: Mapped[datetime.datetime] = mapped_column('deleted_at', nullable=True)
 
