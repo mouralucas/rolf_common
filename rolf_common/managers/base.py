@@ -103,7 +103,7 @@ class BaseDataManager:
 
         return result
 
-    async def get_by_id(self, sql_model:SQLModel, object_id: Any) -> SQLModel | None:
+    async def get_by_id(self, sql_model: Type[SQLModel], object_id: Any) -> SQLModel | None:
         stmt = select(sql_model).where(sql_model.id == object_id)
 
         obj: SQLModel = await self.get_only_one(stmt)
