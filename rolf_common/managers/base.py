@@ -29,6 +29,13 @@ class BaseDataManager:
         self.session.add_all(sql_models)
         await self.session.commit()
 
+        # TODO: test if this is a good approach to batch refresh (consider the order created when refreshing)
+        # ids = [sql_model.id for sql_model in sql_models]
+        # refreshed_models = await self.session.execute(
+        #     select(SQLModel).where(SQLModel.id.in_(ids))
+        # )
+        # refreshed_models = refreshed_models.scalars().all()
+
         return sql_models
 
     async def update_one(self, sql_statement: Executable, sql_model: SQLModel) -> SQLModel:
@@ -95,6 +102,13 @@ class BaseDataManager:
         # TODO: maybe handle exceptions to return default values
 
         return result
+
+    async def get_by_id(self, sql_model:SQLModel, object_id: Any) -> SQLModel | None:
+        stmt = select(sql_model).where(sql_model.id == object_id)
+
+        obj: SQLModel = await self.get_only_one(stmt)
+
+        return obj
 
     async def get_all(self, select_statement: Executable,
                       unique_result: bool = False,
