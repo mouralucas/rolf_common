@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import Executable
 
 from rolf_common.models.base import SQLModel
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 
 class BaseDataManager:
@@ -37,6 +38,25 @@ class BaseDataManager:
         # refreshed_models = refreshed_models.scalars().all()
 
         return sql_models
+
+    async def add_or_ignore_all(self, sql_model: Type[SQLModel], list_fields: list[dict[str, Any]]) -> list[SQLModel]:
+        """
+            Function to add batch to a sql model ignoring if an entry with the same id already exists.
+            This should be used with caution, it uses a dialect specific implementation and may be slow for some cases (not tested)
+
+            This was created for populate in-memory test databases
+        :param sql_model: The model that data will be added to
+        :param list_fields: A list o dict. The dict must contain all fields that will be added to the model.
+        :return: The list o added models
+        """
+        for idx, i in enumerate(list_fields):
+            new_row = pg_insert(sql_model).values(i).on_conflict_do_nothing(index_elements=['id'])
+            await self.session.execute(new_row)
+
+        await self.session.commit()
+        added_rows = await self.get_all(select(sql_model))
+
+        return added_rows
 
     async def update_one(self, sql_statement: Executable, sql_model: SQLModel) -> SQLModel:
         """
