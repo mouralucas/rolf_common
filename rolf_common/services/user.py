@@ -1,3 +1,4 @@
+import httpx
 from httpx import AsyncClient
 from fastapi import Depends, HTTPException
 from fastapi import status
@@ -22,7 +23,12 @@ async def get_user(permissions: SecurityScopes, token: str = Depends(oauth2_sche
             'permissions': permissions
         }
         # TODO: add some verification to check if system is online, if not change to backup or offline check
-        auth_response = await client.post(auth_service_base_url + '/validate/auth', json=payload)
+        try:
+            auth_response = await client.post(auth_service_base_url + '/validate/auth', json=payload)
+        except httpx.ConnectError as err:
+            print('Connection error with User Service')
+        except Exception as e:
+            raise e
 
         if auth_response.status_code != status.HTTP_200_OK:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
