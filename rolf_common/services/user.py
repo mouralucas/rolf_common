@@ -26,7 +26,7 @@ async def get_user(permissions: SecurityScopes, token: str = Depends(oauth2_sche
         try:
             auth_response = await client.post(auth_service_base_url + '/validate/auth', json=payload)
         except httpx.ConnectError as err:
-            print('Connection error with User Service')
+           raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail='Connection error with User Service')
         except Exception as e:
             raise e
 
