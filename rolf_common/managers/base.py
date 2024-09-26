@@ -4,7 +4,7 @@ from typing import Any, List, Sequence, Type
 
 from fastapi import HTTPException, status
 from pydantic import BaseModel
-from sqlalchemy import func, select
+from sqlalchemy import func, select, RowMapping
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import Executable
@@ -149,7 +149,7 @@ class BaseDataManager:
 
     async def get_all(self, select_statement: Executable,
                       unique_result: bool = False,
-                      raise_exception: bool = False) -> list[SQLModel] | None:
+                      raise_exception: bool = False) -> list[RowMapping] | None:
         """
         Created by: Lucas Penha de Moura - 09/02/2024
            Get one register, and one only, if none or more than one is found raise an exception
@@ -158,13 +158,13 @@ class BaseDataManager:
         :param unique_result: If true, apply unique to the query, used when query contains joins ***(investigate reason)***
         :param raise_exception: If true, raise an exception if no data is found, if false, return None
 
-        :return: The list of objected fetched, if any. If none can raise exception if param is setted
+        :return: The list of objected fetched, if any. If none can raise exception if param is set
         """
-        result = await self.session.scalars(select_statement)
+        result = await self.session.execute(select_statement)
         if unique_result:
             result = result.unique()
 
-        result = result.all()
+        result = result.mappings().all()
 
         if result:
             return list(result)
