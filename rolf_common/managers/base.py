@@ -29,7 +29,7 @@ class BaseDataManager:
         :return: The refreshed object of the inserted model
         """
         self.session.add(sql_model)
-        await self.session.commit()
+        await self.session.flush()
         await self.session.refresh(sql_model)
 
         return sql_model
@@ -45,7 +45,7 @@ class BaseDataManager:
         :return: the list of models that were inserted
         """
         self.session.add_all(sql_models)
-        await self.session.commit()
+        await self.session.flush()
 
         if refresh_response:
             [await self.session.refresh(i) for i in sql_models]
@@ -59,7 +59,8 @@ class BaseDataManager:
             Method to add batch to a sql model ignoring if an entry with the same id already exists.
             This should be used with caution, it uses a dialect specific implementation and may be slow for some cases (not tested)
 
-            This was created for populate in-memory test databases
+            This was created for populate in-memory test databases and development database, and should not be used in actual code.
+                It uses commit directly, and this disrupts the "transaction mode" used in all endpoints
 
         :param sql_model: The model that data will be added to
         :param list_fields: A list o dict. The dict must contain all fields that will be added to the model.
@@ -89,7 +90,7 @@ class BaseDataManager:
         try:
             sql_model.edited_at = datetime.utcnow()
             await self.session.execute(sql_statement)
-            await self.session.commit()
+            await self.session.flush()
             await self.session.refresh(sql_model)
         except Exception as e:
             raise e
