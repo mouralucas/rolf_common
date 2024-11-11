@@ -13,6 +13,5 @@ class DefaultModel(BaseModel):
     model_config = ConfigDict(from_attributes=True,
                               alias_generator=AliasGenerator(
                                   alias=to_camel,
-                                  validation_alias=to_snake,
                                   serialization_alias=to_camel,
                               ))
