@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from pyexpat import model
 from typing import Any, List, Sequence, Type
 
@@ -14,8 +14,9 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 
 class BaseDataManager:
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(self, session: AsyncSession, log_session) -> None:
         self.session = session
+        self.log_session = log_session
 
     """Base data manager class responsible for operations over database."""
 
@@ -28,10 +29,17 @@ class BaseDataManager:
         :param sql_model: The model that will be inserted
         :return: The refreshed object of the inserted model
         """
-        self.session.add(sql_model)
-        await self.session.flush()
-        await self.session.refresh(sql_model)
-
+        try:
+            self.session.add(sql_model)
+            await self.session.flush()
+            await self.session.refresh(sql_model)
+        except Exception as e:
+            self.log_session["logs"].insert_one({
+                "message": 'A error occur while inserting into a model',
+                'level': 'SQL',
+                'error': str(e),
+                'datetime': datetime.now(timezone.utc),
+            })
         return sql_model
 
     async def add_all(self, sql_models: list[SQLModel], refresh_response: bool = True) -> list[SQLModel]:

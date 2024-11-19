@@ -2,6 +2,7 @@ import contextlib
 from typing import AsyncIterator
 
 from motor.motor_asyncio import AsyncIOMotorClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from rolf_common.backend.settings import settings
 
@@ -23,7 +24,7 @@ class NoSqlDatabaseSessionManager:
             print("MongoDB connection closed")
 
     @contextlib.asynccontextmanager
-    async def session(self) -> AsyncIterator:
+    async def session(self) -> AsyncIterator[AsyncSession]:
         if not self._client:
             raise RuntimeError("MongoDB client is not initialized")
 
@@ -35,6 +36,3 @@ class NoSqlDatabaseSessionManager:
             raise
         finally:
             print("MongoDB session completed")
-
-
-mongo_session_manager = NoSqlDatabaseSessionManager(host=settings.log_database_url, db_name=settings.log_database_name)

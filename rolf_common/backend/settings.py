@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # Microservice comm settings
     auth_service_base_url: str = 'http://localhost:8001'
 
-    log_database_name: str = None
-    log_database_url: str = None
+    log_database_name: str | None = None
+    log_database_url: str | None = None
 
 settings = Settings()
