@@ -34,12 +34,14 @@ class BaseDataManager:
             await self.session.flush()
             await self.session.refresh(sql_model)
         except Exception as e:
-            self.log_session["logs"].insert_one({
-                "message": 'A error occur while inserting into a model',
-                'level': 'SQL',
-                'error': str(e),
-                'datetime': datetime.now(timezone.utc),
-            })
+            # self.log_session["logs"].insert_one({
+            #     "message": 'A error occur while inserting into a model',
+            #     'level': 'DEBUG',
+            #     'error': str(e),
+            #     'datetime': datetime.now(timezone.utc),
+            # })
+            pass
+
         return sql_model
 
     async def add_all(self, sql_models: list[SQLModel], refresh_response: bool = True) -> list[SQLModel]:
