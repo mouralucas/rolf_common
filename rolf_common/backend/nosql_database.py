@@ -6,7 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from rolf_common.backend.settings import settings
 
-
 class NoSqlDatabaseSessionManager:
     def __init__(self, host: str, db_name: str):
         self._uri = host
@@ -36,3 +35,27 @@ class NoSqlDatabaseSessionManager:
             raise
         finally:
             print("MongoDB session completed")
+
+
+_db_connection: NoSqlDatabaseSessionManager | None = None
+
+def set_db_connection(connection: NoSqlDatabaseSessionManager):
+    """
+    Created by: Lucas Penha de Moura - 20/11/2024
+
+        Create a global variable to store the NoSQL Database connection class
+    """
+    global _db_connection
+    _db_connection = connection
+    print('Configurado!')
+
+
+def get_db_connection() -> NoSqlDatabaseSessionManager:
+    """
+    Created by: Lucas Penha de Moura - 20/11/2024
+
+        Get the NoSQL Database connection class
+    """
+    if _db_connection is None:
+        raise RuntimeError("A conexão com o banco de dados não foi configurada.")
+    return _db_connection
