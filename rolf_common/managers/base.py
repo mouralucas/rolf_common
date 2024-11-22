@@ -14,9 +14,8 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 
 class BaseDataManager:
-    def __init__(self, session: AsyncSession, log_session) -> None:
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
-        self.log_session = log_session
 
     """Base data manager class responsible for operations over database."""
 

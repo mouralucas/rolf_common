@@ -1,14 +1,24 @@
 import logging
-import sys
 
-from rolf_common.backend.nosql_database import get_db_connection
-from rolf_common.managers.logs import BaseLogDataManager
-
+internal_handler = None
 logger = logging.getLogger("loger_handler")
 logger.setLevel(logging.INFO)
 
-loger_handler = BaseLogDataManager(get_db_connection())
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-loger_handler.setFormatter(formatter)
 
-logger.addHandler(loger_handler)
+def set_log_handler(handler):
+    global internal_handler
+
+    internal_handler = handler
+
+    logger.handlers.clear()
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+
+def get_logger():
+
+    if not internal_handler:
+        return
+        # raise ValueError("The logging handler was not set")
+    return logger

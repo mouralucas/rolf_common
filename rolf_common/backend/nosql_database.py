@@ -1,4 +1,4 @@
-import contextlib
+from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -22,7 +22,7 @@ class NoSqlDatabaseSessionManager:
             self._client.close()
             print("MongoDB connection closed")
 
-    @contextlib.asynccontextmanager
+    @asynccontextmanager
     async def session(self) -> AsyncIterator[AsyncSession]:
         if not self._client:
             raise RuntimeError("MongoDB client is not initialized")
@@ -57,5 +57,6 @@ def get_db_connection() -> NoSqlDatabaseSessionManager:
         Get the NoSQL Database connection class
     """
     if _db_connection is None:
-        raise RuntimeError("A conexão com o banco de dados não foi configurada.")
+        pass
+        # raise RuntimeError("A conexão com o banco de dados não foi configurada.")
     return _db_connection
