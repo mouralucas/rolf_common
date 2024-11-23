@@ -9,6 +9,7 @@ from rolf_common.backend.logger import get_logger
 
 class LogsMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        # TODO: add code in a try block
         body = await request.body()
         body = json.loads(body.decode("utf-8")) if body else None
 
@@ -16,6 +17,9 @@ class LogsMiddleware(BaseHTTPMiddleware):
         response_body = b"".join([chunk async for chunk in response.body_iterator])
 
         response_message = {
+            'base_url': str(request.base_url),
+            'host': request.url.netloc,
+            'path': request.scope.get('path'),
             'url': str(request.url),
             'method': request.method,
             'path_params': request.path_params,
@@ -29,7 +33,7 @@ class LogsMiddleware(BaseHTTPMiddleware):
             'response_headers': dict(response.headers),
             'response_body': response_body.decode('utf-8'),
         }
+
         get_logger().info(json.dumps(response_message), extra={'is_request': True})
 
-        return StreamingResponse(iter([response_body]), status_code=response.status_code,
-                                 headers=dict(response.headers))
+        return StreamingResponse(iter([response_body]), status_code=response.status_code, headers=dict(response.headers))

@@ -19,6 +19,5 @@ def set_log_handler(handler):
 def get_logger():
 
     if not internal_handler:
-        return
-        # raise ValueError("The logging handler was not set")
+        return logging.getLogger()
     return logger
