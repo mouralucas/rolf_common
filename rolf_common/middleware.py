@@ -28,9 +28,8 @@ class LogsMiddleware(BaseHTTPMiddleware):
             'status_code': response.status_code,
             'response_headers': dict(response.headers),
             'response_body': response_body.decode('utf-8'),
-            'r': response
         }
-        get_logger().info(json.dumps(response_message), extra={'is_request': 'É os guri'})
+        get_logger().info(json.dumps(response_message), extra={'is_request': True})
 
         return StreamingResponse(iter([response_body]), status_code=response.status_code,
                                  headers=dict(response.headers))
