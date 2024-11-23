@@ -5,3 +5,4 @@ httpx~=0.24.1
 pydantic-settings==2.1.0
 sqlalchemy[asyncio]==2.0.15
 motor~=3.6.0
+starlette~=0.36.3

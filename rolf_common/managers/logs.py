@@ -1,3 +1,4 @@
+import json
 import logging
 import datetime
 
@@ -9,7 +10,8 @@ class BaseLogDataManager(logging.Handler):
     def __init__(self, connection_class: NoSqlDatabaseSessionManager, collection_name: str | None = None):
         super().__init__()
         self.db_connection_class: NoSqlDatabaseSessionManager = connection_class
-        self.collection: str = collection_name or 'logs'
+        self.base_collection: str = collection_name or 'logs'
+        self.collection = self.base_collection
 
     def emit(self, record):
         """
@@ -41,7 +43,18 @@ class BaseLogDataManager(logging.Handler):
         """
         Created by: Lucas Penha de Moura - 21/11/2024
             Create the json to be inserted into the database
+
+            If it is a request log (set using extra field 'is_request') save in a different collection
+            By default it's the same name as base_collection with a 'request_' prefix
         """
+
+        is_request = record.__dict__.get('is_request')
+        if is_request:
+            # If it is a request log (set using extra field 'is_request') save in a different collection
+            # By default it's the same name as base_collection with a 'request_' prefix
+            self.collection = 'request_' + self.base_collection
+            return json.loads(record.getMessage())
+
         return {
             "timestamp": datetime.datetime.utcfromtimestamp(record.created).isoformat(),
             "level": record.levelname,
