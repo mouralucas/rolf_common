@@ -6,8 +6,10 @@ from typing import (
     List,
 )
 
-from sqlalchemy import MetaData, Table
+from sqlalchemy import MetaData, Table, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column, declarative_base
+
+from rolf_common.util.datetime import get_timestamp_aware
 
 Base = declarative_base()
 
@@ -22,9 +24,9 @@ class SQLModel(Base):
 
     id: Mapped[uuid.UUID] = mapped_column('id', primary_key=True, default=uuid.uuid4)
     active: Mapped[bool] = mapped_column('active', default=True)
-    created_at: Mapped[datetime.datetime] = mapped_column('created_at', default=datetime.datetime.utcnow)
-    edited_at: Mapped[datetime.datetime] = mapped_column('edited_at', nullable=True)
-    deleted_at: Mapped[datetime.datetime] = mapped_column('deleted_at', nullable=True)
+    created_at: Mapped[datetime.datetime] = mapped_column('created_at', type_=TIMESTAMP(timezone=True), default=get_timestamp_aware)
+    edited_at: Mapped[datetime.datetime] = mapped_column('edited_at', type_=TIMESTAMP(timezone=True), nullable=True)
+    deleted_at: Mapped[datetime.datetime] = mapped_column('deleted_at', TIMESTAMP(timezone=True), nullable=True)
 
     created_by: Mapped[uuid.UUID] = mapped_column('created_by', nullable=True, default=None)
     edited_by: Mapped[uuid.UUID] = mapped_column('edited_by', nullable=True, default=None)
