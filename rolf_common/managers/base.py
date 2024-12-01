@@ -52,7 +52,7 @@ class BaseDataManager:
 
         return sql_models
 
-    async def add_or_ignore_all(self, sql_model: Type[SQLModel], list_fields: list[dict[str, Any]]) -> list[SQLModel]:
+    async def add_or_ignore_all(self, sql_model: Type[SQLModel], list_fields: list[dict[str, Any]]) -> list[RowMapping] | None:
         """
         Created by: Lucas Penha de Moura - 31/08/2024
 
@@ -88,7 +88,7 @@ class BaseDataManager:
             raise HTTPException(status_code=status.HTTP_428_PRECONDITION_REQUIRED)
 
         try:
-            sql_model.edited_at = datetime.utcnow()
+            sql_model.edited_at = datetime.now(timezone.utc)
             await self.session.execute(sql_statement)
             await self.session.flush()
             await self.session.refresh(sql_model)
