@@ -15,7 +15,6 @@ class NoSqlDatabaseSessionManager:
     async def initialize(self):
         if self._client is None:
             self._client = AsyncIOMotorClient(self._uri)
-        print("MongoDB client initialized")
 
     async def close(self):
         if self._client:
@@ -31,10 +30,9 @@ class NoSqlDatabaseSessionManager:
         try:
             yield db
         except Exception as e:
-            print(f"Error in MongoDB session: {e}")
             raise
         finally:
-            print("MongoDB session completed")
+            pass
 
 
 _db_connection: NoSqlDatabaseSessionManager | None = None
@@ -47,7 +45,6 @@ def set_db_connection(connection: NoSqlDatabaseSessionManager):
     """
     global _db_connection
     _db_connection = connection
-    print('Configurado!')
 
 
 def get_db_connection() -> NoSqlDatabaseSessionManager:
