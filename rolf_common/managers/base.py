@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from pyexpat import model
 from typing import Any, List, Sequence, Type
 
 from fastapi import HTTPException, status
@@ -14,10 +13,25 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 
 class BaseDataManager:
+    """
+    Created by: Lucas Penha de Moura - 29/05/2024
+
+        Base data manager class responsible for operations over a database.
+    """
+
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    """Base data manager class responsible for operations over database."""
+    @staticmethod
+    def query_builder(query_model: Any, columns: list):
+        """
+        Created by: Lucas Penha de Moura - 01/05/2025
+
+            This method creates a basic query based on the selected columns
+        """
+        if columns is None:
+            columns = [query_model]
+        return select(*columns)
 
     async def add_one(self, sql_model: SQLModel) -> SQLModel:
         """
@@ -175,32 +189,3 @@ class BaseDataManager:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='No data found in model')
 
         return None
-
-    def get_from_tvf(self, sql_model: Type[SQLModel], *args: Any) -> List[Any]:
-        """Query from table valued function.
-
-        This is a wrapper function that can be used to retrieve data from
-        table valued functions.
-
-        Examples:
-            from app.models.base import SQLModel
-
-            class MyModel(SQLModel):
-                __tablename__ = "function"
-                __table_args__ = {"schema": "schema"}
-
-                x: Mapped[int] = mapped_column("x", primary_key=True)
-                y: Mapped[str] = mapped_column("y")
-                z: Mapped[float] = mapped_column("z")
-
-            # equivalent to "SELECT x, y, z FROM schema.function(1, 'AAA')"
-            BaseDataManager(session).get_from_tvf(MyModel, 1, "AAA")
-        """
-
-        return self.get_all(self.select_from_tvf(sql_model, *args))
-
-    @staticmethod
-    def select_from_tvf(model: Type[SQLModel], *args: Any) -> Executable:
-        fn = getattr(getattr(func, model.schema()), model.table_name())
-        stmt = select(fn(*args).table_valued(*model.fields()))
-        return select(model).from_statement(stmt)

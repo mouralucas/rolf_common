@@ -7,14 +7,11 @@ from typing import (
 )
 
 from sqlalchemy import MetaData, Table, TIMESTAMP
-from sqlalchemy.orm import Mapped, mapped_column, declarative_base
+from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 
 from rolf_common.util.datetime import get_timestamp_aware
 
-Base = declarative_base()
-
-
-class SQLModel(Base):
+class SQLModel(DeclarativeBase):
     """Base class used for model definitions.
 
     Provides convenience methods that can be used to convert model
@@ -26,7 +23,7 @@ class SQLModel(Base):
     active: Mapped[bool] = mapped_column('active', default=True)
     created_at: Mapped[datetime.datetime] = mapped_column('created_at', type_=TIMESTAMP(timezone=True), default=get_timestamp_aware)
     edited_at: Mapped[datetime.datetime] = mapped_column('edited_at', type_=TIMESTAMP(timezone=True), nullable=True)
-    deleted_at: Mapped[datetime.datetime] = mapped_column('deleted_at', TIMESTAMP(timezone=True), nullable=True)
+    deleted_at: Mapped[datetime.datetime] = mapped_column('deleted_at', type_=TIMESTAMP(timezone=True), nullable=True)
 
     created_by: Mapped[uuid.UUID] = mapped_column('created_by', nullable=True, default=None)
     edited_by: Mapped[uuid.UUID] = mapped_column('edited_by', nullable=True, default=None)
