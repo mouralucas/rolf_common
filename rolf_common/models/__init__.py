@@ -1,1 +1,1 @@
-from rolf_common.models.base import SQLModel, Base
+from rolf_common.models.base import SQLModel

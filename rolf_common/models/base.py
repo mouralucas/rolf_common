@@ -6,7 +6,7 @@ from typing import (
     List,
 )
 
-from sqlalchemy import MetaData, Table, TIMESTAMP
+from sqlalchemy import MetaData, Table, TIMESTAMP, String
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 
 from rolf_common.util.datetime import get_timestamp_aware
@@ -59,9 +59,34 @@ class SQLModel(DeclarativeBase):
         return _dict
 
     @classmethod
-    def gather_metadata(cls) -> MetaData:
+    def gather_metadata(cls, engine=None) -> MetaData:
         """Gather metadata from all subclasses."""
         metadata = MetaData()
+        if engine is not None and hasattr(engine, "sync_engine"):
+            engine = engine.sync_engine
+
         for subclass in cls.__subclasses__():
-            Table(subclass.__tablename__, metadata, autoload_with=subclass.metadata.bind)
+            if engine is None:
+                raise ValueError("Engine must be provided for autoload")
+            Table(subclass.__tablename__, metadata, autoload_with=engine)
         return metadata
+
+    @classmethod
+    async def async_gather_metadata(cls, async_engine) -> MetaData:
+        """Async-safe version of gather_metadata."""
+        metadata = MetaData()
+
+        async with async_engine.connect() as conn:
+            def sync_fn(sync_conn):
+                for subclass in cls.__subclasses__():
+                    Table(subclass.__tablename__, metadata, autoload_with=sync_conn)
+                return metadata
+
+            return await conn.run_sync(sync_fn)
+    
+
+class DummyModel(SQLModel):
+    __tablename__ = "dummy"
+
+    name: Mapped[str] = mapped_column(String(50))
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
