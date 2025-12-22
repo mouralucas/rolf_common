@@ -1,5 +1,5 @@
 import pytest
-from rolf_common.models.base import DummyModel, SQLModel
+from rolf_common.models.tests.dummy import DummyModel, SQLModel
 
 @pytest.mark.asyncio
 async def test_table_name():
