@@ -24,7 +24,9 @@ class SQLModel(DeclarativeBase):
     id: Mapped[uuid.UUID] = mapped_column("id", primary_key=True, default=uuid.uuid4)
     active: Mapped[bool] = mapped_column("active", default=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
-        "created_at", type_=TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP")
+        "created_at",
+        type_=TIMESTAMP(timezone=True),
+        server_default=text("CURRENT_TIMESTAMP"),
     )
     edited_at: Mapped[datetime.datetime] = mapped_column(
         "edited_at", type_=TIMESTAMP(timezone=True), nullable=True
